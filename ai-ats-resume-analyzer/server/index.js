@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import analyzeRoutes from "./routes/analyzeRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 
 // --------------------
@@ -38,6 +39,8 @@ app.use(
 // API ROUTES
 // --------------------
 app.use("/api", analyzeRoutes);
+app.use("/api/auth", authRoutes);
+
 
 mongoose
   .connect(process.env.MONGO_URI)

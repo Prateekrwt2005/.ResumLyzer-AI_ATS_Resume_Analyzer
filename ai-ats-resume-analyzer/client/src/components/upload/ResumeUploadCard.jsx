@@ -199,7 +199,7 @@ navigate("/review");
           <button
             onClick={handleAnalyze}
             disabled={loading}
-            className="w-full md:w-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition disabled:opacity-50"
+            className="w-full md:w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition disabled:opacity-50"
           >
             {loading ? "Analyzing Resume..." : "Analyze Resume"}
           </button>

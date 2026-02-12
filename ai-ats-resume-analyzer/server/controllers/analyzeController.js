@@ -47,12 +47,12 @@ export const analyzeResume = async (req, res) => {
     // --------------------
     const completion = await groq.chat.completions.create({
       model: "openai/gpt-oss-120b",
-      temperature: 0,
+      temperature: 0.3,
       messages: [
         {
           role: "system",
           content:
-            "You are an ATS resume evaluator. Respond ONLY with valid JSON."
+            "You are an ATS resume evaluator. Respond ONLY with valid JSON. No explanations."
         },
         {
           role: "user",
@@ -66,7 +66,7 @@ ${role}
 Job Description:
 ${jobDescription}
 
-Return JSON in this format:
+Return JSON exactly in this format:
 {
   "atsScore": number,
   "breakdown": {
@@ -79,6 +79,10 @@ Return JSON in this format:
   "missingKeywords": string[],
   "suggestions": string[]
 }
+
+Rules:
+- All numbers must be between 0 and 100
+- Do NOT include extra fields
 `
         }
       ]
@@ -97,16 +101,21 @@ Return JSON in this format:
     const parsed = JSON.parse(jsonMatch[0]);
 
     // --------------------
-    // NORMALIZE SCORES
+    // SAFE CLAMP LOGIC (FIXES 50-50-50 ISSUE)
     // --------------------
-    const normalize = (n, min, max) =>
-      Math.min(max, Math.max(min, Math.round(n)));
+    const clamp = (value, min = 0, max = 100) => {
+      if (typeof value !== "number" || isNaN(value)) return 65;
+      return Math.max(min, Math.min(max, Math.round(value)));
+    };
 
-    parsed.atsScore = normalize(parsed.atsScore, 55, 95);
-    parsed.breakdown.skills = normalize(parsed.breakdown.skills, 50, 100);
-    parsed.breakdown.content = normalize(parsed.breakdown.content, 50, 100);
-    parsed.breakdown.structure = normalize(parsed.breakdown.structure, 50, 100);
-    parsed.breakdown.tone = normalize(parsed.breakdown.tone, 50, 100);
+    parsed.atsScore = clamp(parsed.atsScore, 40, 95);
+
+    parsed.breakdown = {
+      skills: clamp(parsed.breakdown?.skills, 30, 100),
+      content: clamp(parsed.breakdown?.content, 30, 100),
+      structure: clamp(parsed.breakdown?.structure, 30, 100),
+      tone: clamp(parsed.breakdown?.tone, 30, 100),
+    };
 
     // --------------------
     // ADD RESUME URL
@@ -114,7 +123,7 @@ Return JSON in this format:
     parsed.resumeUrl = `/uploads/${req.file.filename}`;
 
     // --------------------
-    // 🔥 SAVE TO MONGODB (THIS WAS MISSING)
+    // SAVE TO MONGODB
     // --------------------
     await ResumeAnalysis.create({
       name: name || "Unknown",
@@ -122,9 +131,9 @@ Return JSON in this format:
       jobDescription,
       atsScore: parsed.atsScore,
       breakdown: parsed.breakdown,
-      matchedKeywords: parsed.matchedKeywords,
-      missingKeywords: parsed.missingKeywords,
-      suggestions: parsed.suggestions,
+      matchedKeywords: parsed.matchedKeywords || [],
+      missingKeywords: parsed.missingKeywords || [],
+      suggestions: parsed.suggestions || [],
       resumeUrl: parsed.resumeUrl,
     });
 
