@@ -1,13 +1,18 @@
 import dotenv from "dotenv";
-dotenv.config(); // ← MUST be first
+dotenv.config();
 
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import analyzeRoutes from "./routes/analyzeRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import meRoute from "./routes/meRoute.js";
+
+import historyRoutes from "./routes/historyRoutes.js";
 
 
 // --------------------
@@ -22,30 +27,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // --------------------
-// MIDDLEWARE
-// --------------------
-app.use(cors());
-app.use(express.json());
-
-// --------------------
-// SERVE UPLOADED FILES
+// CORS (VERY IMPORTANT)
 // --------------------
 app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
+  cors({
+    origin: "http://localhost:5173", // FRONTEND PORT
+    credentials: true,
+  })
 );
 
+app.use("/api", historyRoutes);
 // --------------------
-// API ROUTES
+// MIDDLEWARE
 // --------------------
-app.use("/api", analyzeRoutes);
+app.use(express.json());
+app.use(cookieParser());
+
+// --------------------
+// SERVE UPLOADS
+// --------------------
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// --------------------
+// ROUTES
+// --------------------
 app.use("/api/auth", authRoutes);
-
-
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error("❌ Mongo error:", err));
+app.use("/api", analyzeRoutes);
+app.use("/api", meRoute);
 
 // --------------------
 // HEALTH CHECK
@@ -55,6 +63,14 @@ app.get("/", (req, res) => {
 });
 
 // --------------------
+// DATABASE
+// --------------------
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ Mongo error:", err));
+
+// --------------------
 // START SERVER
 // --------------------
 const PORT = 5000;
@@ -62,7 +78,6 @@ app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(
     "🔑 Groq key loaded:",
-    !!process.env.GROQ_API_KEY,
-    process.env.GROQ_API_KEY?.startsWith("gsk_")
+    !!process.env.GROQ_API_KEY
   );
 });

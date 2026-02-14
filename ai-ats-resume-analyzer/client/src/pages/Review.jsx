@@ -3,24 +3,49 @@ import { useNavigate } from "react-router-dom";
 
 export default function Review() {
   const navigate = useNavigate();
+
   const [result, setResult] = useState(null);
   const [meta, setMeta] = useState(null);
   const [showPdf, setShowPdf] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // ✅ AUTH + LOAD SESSION DATA
   useEffect(() => {
-    const r = sessionStorage.getItem("atsResult");
-    const m = sessionStorage.getItem("atsMeta");
+    const init = async () => {
+      try {
+        // 1️⃣ Check login
+        const res = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
 
-    if (!r || !m) {
-      navigate("/");
-      return;
-    }
+        if (!res.ok) {
+          navigate("/login");
+          return;
+        }
 
-    setResult(JSON.parse(r));
-    setMeta(JSON.parse(m));
+        // 2️⃣ Load session data
+        const storedResult = sessionStorage.getItem("atsResult");
+        const storedMeta = sessionStorage.getItem("atsMeta");
+
+        if (!storedResult || !storedMeta) {
+          navigate("/");
+          return;
+        }
+
+        setResult(JSON.parse(storedResult));
+        setMeta(JSON.parse(storedMeta));
+        setLoading(false);
+      } catch (err) {
+        console.error("Review load error:", err);
+        navigate("/");
+      }
+    };
+
+    init();
   }, [navigate]);
 
-  if (!result || !meta) {
+  // ✅ Loading Screen
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-500">
         Loading review...
@@ -94,105 +119,114 @@ export default function Review() {
           ))}
         </div>
 
-      {/* KEYWORDS */}
-<div className="grid md:grid-cols-2 gap-8 mb-8">
+        {/* KEYWORDS */}
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
 
-  {/* FOUND */}
-  <div className="bg-slate-50 rounded-3xl shadow p-6">
-    <h3 className="font-semibold text-black text-xl mb-4">Keywords Found</h3>
-<p className="mt-4 font-semibold text-sm text-slate-600">
-  ⚠️ If overused, these may reduce clarity:
-</p>
-<ul className="list-disc list-inside text-sm text-slate-500 mt-2 mb-3.5">
-  <li>Backend-heavy terms (if frontend role)</li>
-  <li>Unrelated technologies</li>
-</ul>
+          {/* FOUND */}
+          <div className="bg-slate-50 rounded-3xl shadow p-6">
+            <h3 className="font-semibold text-black text-xl mb-4">
+              Keywords Found
+            </h3>
 
-    {matchedKeywords.length > 0 ? (
-      <div className="flex flex-wrap gap-2">
-        {matchedKeywords.map((k, i) => (
-          <span
-            key={i}
-            className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-          >
-            {k}
-          </span>
-        ))}
-      </div>
-    ) : (
-      <p className="text-slate-400 text-sm">No strong keyword matches found.</p>
-    )}
-  </div>
+            <p className="mt-4 font-semibold text-sm text-slate-600">
+              ⚠️ If overused, these may reduce clarity:
+            </p>
 
-  {/* MISSING */}
-  <div className="bg-slate-50 rounded-3xl shadow p-6">
-    <h3 className="font-semibold  text-black text-xl mb-4">Missing Keywords</h3>
-<p className="mt-4 text-sm font-semibold text-slate-600">
-  👉 Add these keywords naturally in:
-</p>
-<ul className="mb-3.5 list-disc list-inside text-sm text-slate-500 mt-2">
-  <li>Skills section</li>
-  <li>Project descriptions</li>
-  <li>Experience bullet points</li>
-</ul>
+            <ul className="list-disc list-inside text-sm text-slate-500 mt-2 mb-3.5">
+              <li>Backend-heavy terms (if frontend role)</li>
+              <li>Unrelated technologies</li>
+            </ul>
 
-    {missingKeywords.length > 0 ? (
-      <div className="flex flex-wrap gap-2">
-        {missingKeywords.map((k, i) => (
-          <span
-            key={i}
-            className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
-          >
-            {k}
-          </span>
-        ))}
-      </div>
-    ) : (
-      <p className="text-slate-400 text-sm">No critical keywords missing 🎉</p>
-    )}
-  </div>
+            {matchedKeywords?.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {matchedKeywords.map((k, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
+                  >
+                    {k}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-400 text-sm">
+                No strong keyword matches found.
+              </p>
+            )}
+          </div>
 
-</div>
+          {/* MISSING */}
+          <div className="bg-slate-50 rounded-3xl shadow p-6">
+            <h3 className="font-semibold text-black text-xl mb-4">
+              Missing Keywords
+            </h3>
 
+            <p className="mt-4 text-sm font-semibold text-slate-600">
+              👉 Add these keywords naturally in:
+            </p>
+
+            <ul className="mb-3.5 list-disc list-inside text-sm text-slate-500 mt-2">
+              <li>Skills section</li>
+              <li>Project descriptions</li>
+              <li>Experience bullet points</li>
+            </ul>
+
+            {missingKeywords?.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {missingKeywords.map((k, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
+                  >
+                    {k}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-slate-400 text-sm">
+                No critical keywords missing 🎉
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* SUGGESTIONS */}
         <div className="bg-slate-50 rounded-3xl shadow-md p-8">
-          <h3 className="text-xl  text-black text-xl font-semibold mb-4">
+          <h3 className="text-xl text-black font-semibold mb-4">
             Improvement Suggestions
           </h3>
           <ul className="list-disc list-inside space-y-2 text-slate-700">
-            {suggestions.map((s, i) => (
-              <li key={i}>{s}</li>
+            {suggestions?.map((s, i) => (
+              <li dangerouslySetInnerHTML={{ __html: s }} />
             ))}
           </ul>
         </div>
       </div>
 
       {/* PDF MODAL */}
- {showPdf && (
-  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div className="bg-white w-[95vw] h-[95vh] rounded-xl relative overflow-hidden">
-      <button
-        onClick={() => setShowPdf(false)}
-        className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded"
-      >
-        Close
-      </button>
+      {showPdf && meta.resumeUrl && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white w-[95vw] h-[95vh] rounded-xl relative overflow-hidden">
+            <button
+              onClick={() => setShowPdf(false)}
+              className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded"
+            >
+              Close
+            </button>
 
-      <iframe
-        src={`http://localhost:5000${result.resumeUrl}#toolbar=0`}
-        className="w-full h-full"
-        title="Resume PDF"
-      />
+            <iframe
+            src={`http://localhost:5000${meta.resumeUrl}`}
+              className="w-full h-full"
+              title="Resume PDF"
+            />
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-)}
-
-    </div>
-
-    
   );
-  function AnimatedScore({ value }) {
+}
+
+function AnimatedScore({ value }) {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
@@ -219,6 +253,4 @@ export default function Review() {
       <p className="mt-2 text-sm text-slate-500">ATS Score</p>
     </div>
   );
-}
-
 }
