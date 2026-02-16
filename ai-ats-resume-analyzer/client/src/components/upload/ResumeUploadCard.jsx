@@ -15,13 +15,27 @@ export default function ResumeUploadCard() {
 
   // ✅ Check if logged in
   useEffect(() => {
-    fetch("http://localhost:5000/api/me", {
-      credentials: "include",
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setUser(data))
-      .catch(() => setUser(null));
-  }, []);
+  fetch("http://localhost:5000/api/me", {
+    credentials: "include",
+  })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => setUser(data))
+    .catch(() => setUser(null));
+
+  // 🔥 Restore temporary form data if exists
+  const tempData = sessionStorage.getItem("tempAnalyzeData");
+
+  if (tempData) {
+    const parsed = JSON.parse(tempData);
+    setName(parsed.name || "");
+    setRole(parsed.role || "");
+    setJobDescription(parsed.jobDescription || "");
+
+    // Clear temp data after restoring
+    sessionStorage.removeItem("tempAnalyzeData");
+  }
+
+}, []);
 
   const handleLogout = async () => {
     await fetch("http://localhost:5000/api/auth/logout", {
@@ -41,10 +55,21 @@ export default function ResumeUploadCard() {
         credentials: "include",
       });
 
-      if (!authCheck.ok) {
-        navigate("/login");
-        return;
-      }
+      
+if (!authCheck.ok) {
+  // 🔥 Save form data temporarily
+  sessionStorage.setItem(
+    "tempAnalyzeData",
+    JSON.stringify({
+      name,
+      role,
+      jobDescription,
+    })
+  );
+
+  navigate("/login");
+  return;
+}
 
       if (!resumeFile) {
         setError("Please upload resume.");
@@ -239,17 +264,46 @@ export default function ResumeUploadCard() {
         )}
 
         <div className="mt-10">
-          <button
-            type="button"
-            onClick={handleAnalyze}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition disabled:opacity-50"
-          >
-            {loading ? "Analyzing Resume..." : "Analyze Resume"}
-          </button>
+         <button
+  type="button"
+  onClick={handleAnalyze}
+  disabled={loading}
+  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition disabled:opacity-70 flex items-center justify-center gap-3"
+>
+  {loading ? (
+    <>
+      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      Analyzing...
+    </>
+  ) : (
+    "Analyze Resume"
+  )}
+</button>
         </div>
 
       </div>
+
+      {loading && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl p-10 w-[350px] shadow-2xl text-center">
+      
+      <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+
+      <h2 className="text-xl font-semibold text-slate-800 mb-2">
+        Analyzing Resume
+      </h2>
+
+      <p className="text-slate-500 text-sm">
+        Matching against ATS systems...
+      </p>
+
+      <div className="mt-6 h-2 bg-slate-200 rounded-full overflow-hidden">
+        <div className="h-2 bg-indigo-600 animate-progress rounded-full"></div>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }

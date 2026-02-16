@@ -58,12 +58,7 @@ export default function Landing() {
           </button>
         )}
       </div>
-       <button
-  onClick={() => navigate("/history")}
-  className="absolute top-8 right-10 bg-black text-white px-4 py-2 rounded-lg"
->
-  History
-</button>
+      
       <ResumeUploadCard />
     </div>
   );

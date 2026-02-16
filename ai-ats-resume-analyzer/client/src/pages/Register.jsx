@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
@@ -26,38 +25,39 @@ export default function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
+        throw new Error(data.message || "Registration failed");
       }
 
-      // After register, user is auto-logged in (cookie set)
-      navigate("/");
+      // ✅ After register, user is auto-logged in (cookie set)
+      navigate("/review");
 
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // ✅ If already logged in, redirect to analyze
   useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/me", {
-        credentials: "include",
-      });
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
 
-      if (res.ok) {
-        navigate("/");
+        if (res.ok) {
+          navigate("/review");
+        }
+      } catch (err) {
+        // Not logged in → stay on register page
       }
-    } catch (err) {
-      // not logged in, do nothing
-    }
-  };
+    };
 
-  checkAuth();
-}, [navigate]);
+    checkAuth();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
-
+      
       {/* LOGO */}
       <div className="fixed top-8 left-10 text-3xl font-bold tracking-widest text-black">
         .RESUMLYZER

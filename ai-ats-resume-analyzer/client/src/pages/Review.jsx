@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 export default function Review() {
   const navigate = useNavigate();
 
+  const [visible, setVisible] = useState(false);
+
+useEffect(() => {
+  setVisible(true);
+}, []);
+
   const [result, setResult] = useState(null);
   const [meta, setMeta] = useState(null);
   const [showPdf, setShowPdf] = useState(false);
@@ -27,10 +33,10 @@ export default function Review() {
         const storedResult = sessionStorage.getItem("atsResult");
         const storedMeta = sessionStorage.getItem("atsMeta");
 
-        if (!storedResult || !storedMeta) {
-          navigate("/");
-          return;
-        }
+       if (!storedResult || !storedMeta) {
+  navigate("/");
+  return;
+}
 
         setResult(JSON.parse(storedResult));
         setMeta(JSON.parse(storedMeta));
@@ -57,7 +63,9 @@ export default function Review() {
     result;
 
   return (
-    <div className="min-h-screen w-screen bg-slate-200 overflow-x-hidden">
+    <div className={`min-h-screen w-screen bg-slate-200 overflow-x-hidden transition-opacity duration-700 ${
+  visible ? "opacity-100" : "opacity-0"
+}`}>
       <div className="max-w-5xl mx-auto px-6 md:px-10 py-10">
 
         {/* HEADER */}
@@ -70,6 +78,19 @@ export default function Review() {
             <span className="font-semibold">{meta.role}</span>
           </p>
         </div>
+{/* NAVBAR BACK BUTTON */}
+<div className="absolute top-6 left-8">
+  <button
+  onClick={() => {
+    sessionStorage.removeItem("atsResult");
+    sessionStorage.removeItem("atsMeta");
+    navigate("/");
+  }}
+  className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl hover:opacity-80 transition text-sm"
+>
+  Home
+</button>
+</div>
 
         {/* VIEW RESUME BUTTON */}
         {meta.resumeUrl && (

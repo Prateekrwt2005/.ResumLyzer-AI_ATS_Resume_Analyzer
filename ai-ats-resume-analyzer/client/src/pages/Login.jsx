@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
@@ -25,53 +24,53 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        throw new Error(data.message || "Login failed");
       }
 
-      navigate("/");
+      // ✅ After login → go to analyze
+      navigate("/review");
+
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // ✅ If already logged in → go to analyze
   useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/me", {
-        credentials: "include",
-      });
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
 
-      if (res.ok) {
-        navigate("/");
+        if (res.ok) {
+          navigate("/review");
+        }
+      } catch (err) {
+        // not logged in
       }
-    } catch (err) {
-      // not logged in, do nothing
-    }
-  };
+    };
 
-  checkAuth();
-}, [navigate]);
+    checkAuth();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
-
-      {/* LOGO */}
+      
       <div className="fixed top-8 left-10 text-3xl font-bold tracking-widest text-black">
         .RESUMLYZER
       </div>
 
-      {/* CARD */}
       <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-12">
 
-        {/* TITLE */}
-      <h1 className="text-5xl font-bold text-slate-900 text-center whitespace-nowrap">
-  Welcome Back
-</h1>
+        <h1 className="text-5xl font-bold text-slate-900 text-center whitespace-nowrap">
+          Welcome Back
+        </h1>
+
         <p className="text-slate-600 text-center mt-2 mb-8">
           Log in to continue your job journey
         </p>
 
-        {/* FORM */}
         <div className="space-y-6">
 
           <div>
