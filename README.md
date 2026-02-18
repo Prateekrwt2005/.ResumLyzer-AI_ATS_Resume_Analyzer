@@ -1,4 +1,4 @@
-# 🚀 Resumlyzer – AI ATS Resume Analyzer
+# 🚀 .Resumlyzer – AI ATS Resume Analyzer
 
 > Smart AI-powered resume intelligence platform that analyzes resumes against job descriptions and generates ATS scores, skill insights, and improvement strategies.
 
