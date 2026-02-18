@@ -17,4 +17,17 @@ router.get("/history", protect, async (req, res) => {
   }
 });
 
+router.delete("/history/:id", protect, async (req, res) => {
+  try {
+    await ResumeAnalysis.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
+    res.json({ message: "Deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Delete failed" });
+  }
+});
+
 export default router;

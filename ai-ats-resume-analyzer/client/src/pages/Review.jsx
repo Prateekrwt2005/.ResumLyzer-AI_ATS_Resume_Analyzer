@@ -3,275 +3,322 @@ import { useNavigate } from "react-router-dom";
 
 export default function Review() {
   const navigate = useNavigate();
-
-  const [visible, setVisible] = useState(false);
-
-useEffect(() => {
-  setVisible(true);
-}, []);
-
+  const [dark, setDark] = useState(
+    localStorage.getItem("theme") === "light" ? false : true
+  );
   const [result, setResult] = useState(null);
   const [meta, setMeta] = useState(null);
-  const [showPdf, setShowPdf] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fadeIn, setFadeIn] = useState(false);
 
-  // ✅ AUTH + LOAD SESSION DATA
+  /* ================= THEME PERSIST ================= */
+  useEffect(() => {
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
+
+  /* ================= PAGE LOAD ================= */
   useEffect(() => {
     const init = async () => {
-      try {
-        // 1️⃣ Check login
-        const res = await fetch("http://localhost:5000/api/me", {
-          credentials: "include",
-        });
+      const res = await fetch("http://localhost:5000/api/me", {
+        credentials: "include",
+      });
 
-        if (!res.ok) {
-          navigate("/login");
-          return;
-        }
-
-        // 2️⃣ Load session data
-        const storedResult = sessionStorage.getItem("atsResult");
-        const storedMeta = sessionStorage.getItem("atsMeta");
-
-       if (!storedResult || !storedMeta) {
-  navigate("/");
-  return;
-}
-
-        setResult(JSON.parse(storedResult));
-        setMeta(JSON.parse(storedMeta));
-        setLoading(false);
-      } catch (err) {
-        console.error("Review load error:", err);
-        navigate("/");
+      if (!res.ok) {
+        navigate("/login");
+        return;
       }
+
+      const storedResult = sessionStorage.getItem("atsResult");
+      const storedMeta = sessionStorage.getItem("atsMeta");
+
+      if (!storedResult || !storedMeta) {
+        navigate("/history");
+        return;
+      }
+
+      setResult(JSON.parse(storedResult));
+      setMeta(JSON.parse(storedMeta));
+      setLoading(false);
+      setTimeout(() => setFadeIn(true), 100);
     };
 
     init();
   }, [navigate]);
 
-  // ✅ Loading Screen
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-slate-500">
-        Loading review...
-      </div>
-    );
-  }
+  if (loading) return null;
 
   const { atsScore, breakdown, matchedKeywords, missingKeywords, suggestions } =
     result;
 
+  const bg = dark
+    ? "bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#0b1120]"
+    : "bg-gradient-to-br from-indigo-50 via-white to-purple-50";
+
+  const text = dark ? "text-white" : "text-black";
+
+  const card = dark
+    ? "bg-[#1e293b] border border-white/10"
+    : "bg-white border border-gray-200 shadow-lg";
+
   return (
-    <div className={`min-h-screen w-screen bg-slate-200 overflow-x-hidden transition-opacity duration-700 ${
-  visible ? "opacity-100" : "opacity-0"
-}`}>
-      <div className="max-w-5xl mx-auto px-6 md:px-10 py-10">
+    <div
+      className={`min-h-screen ${bg} ${text} transition-all duration-500 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      <div className="max-w-6xl mx-auto px-6 py-12">
 
-        {/* HEADER */}
-        <div className="mb-10 text-center">
-          <h1 className="text-5xl font-extrabold text-blue-600">
-            Resume Review
+        {/* HEADER ROW */}
+        <div className="flex justify-between items-center mb-7">
+
+          {/* TITLE LEFT */}
+          <h1
+            className={`text-4xl font-bold leading-[1.2] pb-2 ${
+              dark
+                ? "bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+                : "text-blue-600"
+            }`}
+          >
+            Resume Intelligence Report
           </h1>
-          <p className="mt-2 text-lg text-slate-600">
-            Candidate: <span className="font-semibold">{meta.name}</span> · Role:{" "}
-            <span className="font-semibold">{meta.role}</span>
-          </p>
-        </div>
-{/* NAVBAR BACK BUTTON */}
-<div className="absolute top-6 left-8">
-  <button
-  onClick={() => {
-    sessionStorage.removeItem("atsResult");
-    sessionStorage.removeItem("atsMeta");
-    navigate("/");
-  }}
-  className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl hover:opacity-80 transition text-sm"
->
-  Home
-</button>
-</div>
 
-        {/* VIEW RESUME BUTTON */}
-        {meta.resumeUrl && (
-          <div className="text-center mb-8">
-            <button
-              onClick={() => setShowPdf(true)}
-              className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:opacity-90 transition"
-            >
-              View Resume PDF
-            </button>
-          </div>
-        )}
+          {/* MODE BUTTON RIGHT */}
+          <button
+            onClick={() => setDark(!dark)}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition transform hover:scale-105 ${
+              dark
+                ? "bg-white text-white"
+                : "bg-black text-white"
+            }`}
+          >
+            {dark ? "Light Mode" : "Dark Mode"}
+          </button>
+        </div>
+
+        <p className={`mb-12 ${dark ? "text-slate-400" : "text-gray-600"}`}>
+          {meta.name} · {meta.role}
+        </p>
 
         {/* SCORE CARD */}
-        <div className="bg-slate-50 rounded-3xl shadow-md p-8 flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <div
+          className={`${card} rounded-3xl p-8 flex justify-between items-center mb-12 transition transform hover:-translate-y-1 hover:shadow-2xl`}
+        >
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              Your Resume Score
+            <h2 className="text-xl font-semibold mb-2">
+              Overall ATS Performance
             </h2>
-            <p className="text-slate-500 mt-2 max-w-xl">
-              ATS alignment based on skills, structure, content quality, and tone.
+            <p className={dark ? "text-slate-400 text-sm" : "text-gray-500 text-sm"}>
+              AI-evaluated resume strength
             </p>
           </div>
 
-          <AnimatedScore value={atsScore} />
+          <AnimatedRing score={atsScore} dark={dark} />
         </div>
 
         {/* BREAKDOWN */}
-        <div className="bg-slate-50 rounded-3xl shadow-md p-8 mb-8">
-          <h3 className="text-xl font-semibold text-slate-900 mb-6">
-            Score Breakdown
+        <div
+          className={`${card} rounded-3xl p-8 mb-12 transition transform hover:-translate-y-1 hover:shadow-2xl`}
+        >
+          <h3 className="text-xl font-semibold mb-8">
+            Performance Breakdown
           </h3>
 
-          {Object.entries(breakdown).map(([key, value]) => (
-            <div key={key} className="mb-5">
-              <div className="flex justify-between text-sm text-slate-700 mb-1">
-                <span className="capitalize font-medium">{key}</span>
-                <span>{value}/100</span>
+          {Object.entries(breakdown).map(([key, value]) => {
+            const color =
+              value >= 80
+                ? "bg-green-500"
+                : value >= 60
+                ? "bg-yellow-400"
+                : "bg-red-500";
+
+            return (
+              <div key={key} className="mb-7">
+                <div className="flex justify-between mb-2 text-m">
+                  <span className="capitalize">{key}</span>
+                  <span>{value}/100</span>
+                </div>
+
+                <div className={dark ? "h-2 bg-slate-700 rounded-full" : "h-2 bg-gray-200 rounded-full"}>
+                  <div
+                    className={`${color} h-2 rounded-full transition-all duration-1000`}
+                    style={{ width: `${value}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-2 bg-slate-200 rounded-full">
-                <div
-                  className="h-2 bg-indigo-500 rounded-full transition-all duration-700"
-                  style={{ width: `${value}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* KEYWORDS */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-
-          {/* FOUND */}
-          <div className="bg-slate-50 rounded-3xl shadow p-6">
-            <h3 className="font-semibold text-black text-xl mb-4">
-              Keywords Found
-            </h3>
-
-            <p className="mt-4 font-semibold text-sm text-slate-600">
-              ⚠️ If overused, these may reduce clarity:
-            </p>
-
-            <ul className="list-disc list-inside text-sm text-slate-500 mt-2 mb-3.5">
-              <li>Backend-heavy terms (if frontend role)</li>
-              <li>Unrelated technologies</li>
-            </ul>
-
-            {matchedKeywords?.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {matchedKeywords.map((k, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                  >
-                    {k}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-400 text-sm">
-                No strong keyword matches found.
-              </p>
-            )}
-          </div>
-
-          {/* MISSING */}
-          <div className="bg-slate-50 rounded-3xl shadow p-6">
-            <h3 className="font-semibold text-black text-xl mb-4">
-              Missing Keywords
-            </h3>
-
-            <p className="mt-4 text-sm font-semibold text-slate-600">
-              👉 Add these keywords naturally in:
-            </p>
-
-            <ul className="mb-3.5 list-disc list-inside text-sm text-slate-500 mt-2">
-              <li>Skills section</li>
-              <li>Project descriptions</li>
-              <li>Experience bullet points</li>
-            </ul>
-
-            {missingKeywords?.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {missingKeywords.map((k, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
-                  >
-                    {k}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-400 text-sm">
-                No critical keywords missing 🎉
-              </p>
-            )}
-          </div>
+        <div className="grid md:grid-cols-2 gap-8 font-medium mb-12">
+          <KeywordCard title="Matched Skills" data={matchedKeywords} good dark={dark}/>
+          <KeywordCard title="Missing Skills" data={missingKeywords} dark={dark}/>
         </div>
 
         {/* SUGGESTIONS */}
-        <div className="bg-slate-50 rounded-3xl shadow-md p-8">
-          <h3 className="text-xl text-black font-semibold mb-4">
-            Improvement Suggestions
+        <div
+          className={`${card} rounded-3xl p-8 transition transform hover:-translate-y-1 hover:shadow-2xl`}
+        >
+          <h3 className="text-xl font-semibold mb-6">
+            Improvement Strategy
           </h3>
-          <ul className="list-disc list-inside space-y-2 text-slate-700">
-            {suggestions?.map((s, i) => (
-              <li dangerouslySetInnerHTML={{ __html: s }} />
-            ))}
-          </ul>
-        </div>
-      </div>
 
-      {/* PDF MODAL */}
-      {showPdf && meta.resumeUrl && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white w-[95vw] h-[95vh] rounded-xl relative overflow-hidden">
-            <button
-              onClick={() => setShowPdf(false)}
-              className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded"
-            >
-              Close
-            </button>
+          <div className="space-y-4">
+            {suggestions.map((s, i) => {
+              const updated = dark
+                ? s
+                : s.replace(/text-yellow-400/g, "text-blue-600")
+                    .replace(/bg-yellow-400\/10/g, "bg-blue-100");
 
-            <iframe
-            src={`http://localhost:5000${meta.resumeUrl}`}
-              className="w-full h-full"
-              title="Resume PDF"
-            />
+              return (
+                <div
+                  key={i}
+                  className={dark
+                    ? "bg-[#111827] p-4 rounded-xl text-slate-300"
+                    : "bg-gray-100 p-4 rounded-xl text-gray-800"}
+                  dangerouslySetInnerHTML={{ __html: updated }}
+                />
+              );
+            })}
           </div>
         </div>
-      )}
+
+      </div>
     </div>
   );
 }
 
-function AnimatedScore({ value }) {
-  const [display, setDisplay] = useState(0);
+/* ======================
+   GLOWING RING
+====================== */
+function AnimatedRing({ score, dark }) {
+  const [offset, setOffset] = useState(440);
+  const [displayScore, setDisplayScore] = useState(0);
+
+  const radius = 70;
+  const stroke = 10;
+  const normalizedRadius = radius - stroke * 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+
+  /* ========================
+     Dynamic Gradient by Score
+  ======================== */
+
+  let gradientColors;
+
+  if (score >= 80) {
+    gradientColors = ["#22c55e", "#16a34a"]; // green
+  } else if (score >= 60) {
+    gradientColors = ["#facc15", "#f59e0b"]; // yellow
+  } else {
+    gradientColors = ["#ef4444", "#dc2626"]; // red
+  }
+
+  /* ========================
+     Ring Animation
+  ======================== */
+
+  useEffect(() => {
+    const progressOffset =
+      circumference - (score / 100) * circumference;
+
+    setTimeout(() => setOffset(progressOffset), 200);
+  }, [score, circumference]);
+
+  /* ========================
+     Animated Counter
+  ======================== */
 
   useEffect(() => {
     let start = 0;
-    const interval = setInterval(() => {
-      start += 1;
-      if (start >= value) {
-        start = value;
-        clearInterval(interval);
-      }
-      setDisplay(start);
-    }, 15);
+    const duration = 1500;
+    const increment = score / (duration / 16);
 
-    return () => clearInterval(interval);
-  }, [value]);
+    const counter = setInterval(() => {
+      start += increment;
+      if (start >= score) {
+        start = score;
+        clearInterval(counter);
+      }
+      setDisplayScore(Math.floor(start));
+    }, 16);
+
+    return () => clearInterval(counter);
+  }, [score]);
 
   return (
-    <div className="text-center">
-      <div className="w-28 h-28 rounded-full border-[10px] border-indigo-500 flex items-center justify-center">
-        <span className="text-4xl font-bold text-slate-900">
-          {display}
-        </span>
+    <div className="relative w-40 h-40 flex items-center justify-center">
+      <svg height={radius * 2} width={radius * 2}>
+        <defs>
+          <linearGradient id="grad">
+            <stop offset="0%" stopColor={gradientColors[0]} />
+            <stop offset="100%" stopColor={gradientColors[1]} />
+          </linearGradient>
+        </defs>
+
+        {/* Background Ring */}
+        <circle
+          stroke={dark ? "#1f2937" : "#e5e7eb"}
+          fill="transparent"
+          strokeWidth={stroke}
+          r={normalizedRadius}
+          cx={radius}
+          cy={radius}
+        />
+
+        {/* Animated Ring */}
+        <circle
+          stroke="url(#grad)"
+          fill="transparent"
+          strokeWidth={stroke}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{
+            transition: "stroke-dashoffset 1.5s ease-out",
+          filter: dark
+  ? `drop-shadow(0 0 4px ${gradientColors[0]}80)`
+  : "none",
+
+          }}
+          r={normalizedRadius}
+          cx={radius}
+          cy={radius}
+        />
+      </svg>
+
+      {/* Animated Number */}
+      <span className="absolute text-3xl font-bold">
+        {displayScore}
+      </span>
+    </div>
+  );
+}
+
+
+function KeywordCard({ title, data, good, dark }) {
+  return (
+    <div
+      className={`${
+        dark ? "bg-[#1e293b]" : "bg-white shadow"
+      } p-6 rounded-3xl transition transform hover:-translate-y-1 hover:shadow-xl`}
+    >
+      <h3 className="font-semibold text-m mb-4">{title}</h3>
+
+      <div className="flex text-m flex-wrap gap-3">
+        {data.map((k, i) => (
+          <span
+            key={i}
+            className={`px-3 py-1 rounded-full text-m ${
+              good
+                ? "bg-green-500/20 text-green-500"
+                : "bg-red-500/20 text-red-500"
+            }`}
+          >
+            {k}
+          </span>
+        ))}
       </div>
-      <p className="mt-2 text-sm text-slate-500">ATS Score</p>
     </div>
   );
 }

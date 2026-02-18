@@ -28,7 +28,8 @@ export default function Login() {
       }
 
       // ✅ After login → go to analyze
-      navigate("/review");
+    navigate("/", { replace: true });
+
 
     } catch (err) {
       setError(err.message);
@@ -43,9 +44,10 @@ export default function Login() {
           credentials: "include",
         });
 
-        if (res.ok) {
-          navigate("/review");
-        }
+       if (res.ok) {
+  navigate("/", { replace: true });
+}
+
       } catch (err) {
         // not logged in
       }

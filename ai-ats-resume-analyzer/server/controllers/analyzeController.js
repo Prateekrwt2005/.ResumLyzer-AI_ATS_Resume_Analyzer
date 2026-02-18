@@ -224,40 +224,48 @@ ${resumeText.substring(0, 2000)}
     // =====================================================
     // 🔥 Bold Important Technical Words
     // =====================================================
-    const importantKeywords = [
-      ...requiredSkills,
-      ...missingSkills,
-      ...relevantResumeSkills,
-      "project",
-      "projects",
-      "experience",
-      "skills",
-      "performance",
-      "optimization",
-      "testing",
-      "deployment",
-      "architecture",
-      "API",
-      "database",
-      "frontend",
-      "backend"
-    ];
+   // 🔥 Smart Premium Highlight Logic
 
-    const boldedSuggestions = suggestions.map((text) => {
-      let updated = text;
+const importantKeywords = [
+  ...requiredSkills,
+  ...missingSkills,
+  ...relevantResumeSkills,
+  "project",
+  "quantifiable result",
+  "time",
+  "projects",
+  "experience",
+  "skills",
+  "performance",
+  "optimization",
+  "testing",
+  "deployment",
+  "architecture",
+  "API",
+  "database",
+  "frontend",
+  "backend"
+];
 
-      importantKeywords.forEach((keyword) => {
-        const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(`\\b${safeKeyword}\\b`, "gi");
+// Remove duplicates
+const uniqueKeywords = [...new Set(importantKeywords)]
+  .filter(Boolean)
+  .sort((a, b) => b.length - a.length); // longest first
 
-        updated = updated.replace(
-          regex,
-          `<span class="font-semibold text-slate-900">${keyword}</span>`
-        );
-      });
+const boldedSuggestions = suggestions.map((text) => {
+  let updated = text;
 
-      return updated;
+  uniqueKeywords.forEach((keyword) => {
+    const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`\\b${safeKeyword}\\b`, "gi");
+
+    updated = updated.replace(regex, (match) => {
+      return `<span class="font-semibold text-yellow-400 bg-yellow-400/10 px-1 rounded-md">${match}</span>`;
     });
+  });
+
+  return updated;
+});
 
     // =====================================================
     // 6️⃣ Dynamic Scoring Logic
