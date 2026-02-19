@@ -1,0 +1,28 @@
+# ======================
+# Environment Variables
+# ======================
+.env
+ai-ats-resume-analyzer/server/.env
+
+# ======================
+# Node Modules
+# ======================
+node_modules/
+ai-ats-resume-analyzer/server/node_modules/
+ai-ats-resume-analyzer/client/node_modules/
+
+# ======================
+# Uploads
+# ======================
+ai-ats-resume-analyzer/server/uploads/
+
+# ======================
+# Logs
+# ======================
+*.log
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
