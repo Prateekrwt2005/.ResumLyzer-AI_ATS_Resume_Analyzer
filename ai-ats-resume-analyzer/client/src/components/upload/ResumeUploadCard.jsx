@@ -119,7 +119,7 @@ if (!authCheck.ok) {
   };
 
   return (
-    <div className="font-gilroy relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
+    <div className="font-gilroy  min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
 
       {/* LOGO */}
       <div className="fixed top-8 left-10 text-3xl font-bold tracking-widest text-black z-50">
@@ -157,9 +157,9 @@ if (!authCheck.ok) {
       </div>
 
       {/* CARD */}
-      <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl p-14">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-10">
 
-        <h1 className="text-5xl font-extrabold text-slate-900 leading-tight max-w-3xl">
+        <h1 className="text-4xl font-extrabold text-slate-900 leading-tight max-w-3xl">
           Smart feedback <br />
           for your <span className="text-indigo-600">dream job</span>
         </h1>
