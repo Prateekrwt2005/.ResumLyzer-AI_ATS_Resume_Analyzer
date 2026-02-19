@@ -29,7 +29,8 @@ export default function Register() {
       }
 
       // ✅ After register, user is auto-logged in (cookie set)
-      navigate("/review");
+     navigate("/", { replace: true });
+
 
     } catch (err) {
       setError(err.message);
@@ -45,7 +46,8 @@ export default function Register() {
         });
 
         if (res.ok) {
-          navigate("/review");
+          navigate("/", { replace: true });
+
         }
       } catch (err) {
         // Not logged in → stay on register page

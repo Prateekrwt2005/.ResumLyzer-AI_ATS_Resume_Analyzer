@@ -32,9 +32,10 @@ export default function Review() {
       const storedMeta = sessionStorage.getItem("atsMeta");
 
       if (!storedResult || !storedMeta) {
-        navigate("/history");
-        return;
-      }
+  navigate("/", { replace: true });
+  return;
+}
+
 
       setResult(JSON.parse(storedResult));
       setMeta(JSON.parse(storedMeta));

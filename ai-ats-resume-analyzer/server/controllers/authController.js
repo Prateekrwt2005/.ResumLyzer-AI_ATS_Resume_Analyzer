@@ -28,11 +28,12 @@ export const registerUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
+const isProd = process.env.NODE_ENV === "production";
     // ✅ SET COOKIE HERE
     res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
+  httpOnly: true,
+  sameSite: isProd ? "none" : "lax",
+  secure: isProd,
     });
 
     res.status(201).json({
@@ -65,12 +66,11 @@ export const loginUser = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
-    // ✅ SET COOKIE HERE
-    res.cookie("token", token, {
+const isProd = process.env.NODE_ENV === "production";
+   res.cookie("token", token, {
   httpOnly: true,
-  sameSite: "lax",
-  secure: false, // IMPORTANT for localhost
+  sameSite: isProd ? "none" : "lax",
+  secure: isProd,// IMPORTANT for localhost
 });
 
     res.json({
