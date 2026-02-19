@@ -119,7 +119,7 @@ if (!authCheck.ok) {
   };
 
   return (
-    <div className="font-gilroy  min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
+    <div className="font-gilroy relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 px-6">
 
       {/* LOGO */}
       <div className="fixed top-8 left-10 text-3xl font-bold tracking-widest text-black z-50">
