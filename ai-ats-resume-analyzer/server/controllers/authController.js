@@ -86,6 +86,15 @@ const isProd = process.env.NODE_ENV === "production";
 
 // ---------------- LOGOUT ----------------
 export const logoutUser = (req, res) => {
-  res.clearCookie("token");
+  const isProd = process.env.NODE_ENV === "production";
+
+  res.clearCookie("token", {
+  httpOnly: true,
+  sameSite: isProd ? "none" : "lax",
+  secure: isProd,
+  path: "/"
+});
+
+
   res.json({ message: "Logged out successfully" });
 };
