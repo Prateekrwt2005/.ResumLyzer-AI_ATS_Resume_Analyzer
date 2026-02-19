@@ -9,7 +9,7 @@ export default function Landing() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
           credentials: "include",
         });
 
@@ -24,7 +24,7 @@ export default function Landing() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5000/api/auth/logout", {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

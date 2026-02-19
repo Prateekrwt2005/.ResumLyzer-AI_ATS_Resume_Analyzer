@@ -32,7 +32,7 @@ export default function History() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/history", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/history`, {
           credentials: "include",
         });
 

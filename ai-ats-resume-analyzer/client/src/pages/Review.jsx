@@ -19,7 +19,7 @@ export default function Review() {
   /* ================= PAGE LOAD ================= */
   useEffect(() => {
     const init = async () => {
-      const res = await fetch("http://localhost:5000/api/me", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
         credentials: "include",
       });
 

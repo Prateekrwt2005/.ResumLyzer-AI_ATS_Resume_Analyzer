@@ -15,7 +15,7 @@ export default function ResumeUploadCard() {
 
   // ✅ Check if logged in
   useEffect(() => {
-  fetch("http://localhost:5000/api/me", {
+  fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
     credentials: "include",
   })
     .then(res => res.ok ? res.json() : null)
@@ -38,7 +38,7 @@ export default function ResumeUploadCard() {
 }, []);
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5000/api/auth/logout", {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -51,7 +51,7 @@ export default function ResumeUploadCard() {
     try {
       setError("");
 
-      const authCheck = await fetch("http://localhost:5000/api/me", {
+      const authCheck = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
         credentials: "include",
       });
 
@@ -84,7 +84,7 @@ if (!authCheck.ok) {
       formData.append("role", role);
       formData.append("name", name);
 
-      const response = await fetch("http://localhost:5000/api/analyze", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analyze`, {
         method: "POST",
         body: formData,
         credentials: "include",
