@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 export default function ResumeUploadCard() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+ const [user, setUser] = useState(null);
+const [checkingAuth, setCheckingAuth] = useState(true);
+
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -13,16 +15,28 @@ export default function ResumeUploadCard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ Check if logged in
-  useEffect(() => {
-  fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
-    credentials: "include",
-  })
-    .then(res => res.ok ? res.json() : null)
-    .then(data => setUser(data))
-    .catch(() => setUser(null));
+ useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
+        credentials: "include",
+      });
 
-  // 🔥 Restore temporary form data if exists
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
+
+  checkAuth();
+
   const tempData = sessionStorage.getItem("tempAnalyzeData");
 
   if (tempData) {
@@ -30,12 +44,11 @@ export default function ResumeUploadCard() {
     setName(parsed.name || "");
     setRole(parsed.role || "");
     setJobDescription(parsed.jobDescription || "");
-
-    // Clear temp data after restoring
     sessionStorage.removeItem("tempAnalyzeData");
   }
 
 }, []);
+
 
   const handleLogout = async () => {
     await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
@@ -128,32 +141,33 @@ if (!authCheck.ok) {
 
       {/* 🔥 SIMPLE TOP RIGHT BUTTONS */}
       <div className="fixed top-8 right-10 flex gap-3 z-50">
-        {!user && (
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-black text-white px-4 py-2 rounded-xl text-sm"
-          >
-            Login
-          </button>
-        )}
+        {!checkingAuth && (
+  user ? (
+    <>
+      <button
+        onClick={() => navigate("/history")}
+        className="bg-black text-white px-4 py-2 rounded-xl text-sm"
+      >
+        History
+      </button>
 
-        {user && (
-          <>
-            <button
-              onClick={() => navigate("/history")}
-              className="bg-black text-white px-4 py-2 rounded-xl text-sm"
-            >
-              History
-            </button>
+      <button
+        onClick={handleLogout}
+        className="bg-black text-white px-4 py-2 rounded-xl text-sm"
+      >
+        Logout
+      </button>
+    </>
+  ) : (
+    <button
+      onClick={() => navigate("/login")}
+      className="bg-black text-white px-4 py-2 rounded-xl text-sm"
+    >
+      Login
+    </button>
+  )
+)}
 
-            <button
-              onClick={handleLogout}
-              className="bg-black text-white px-4 py-2 rounded-xl text-sm"
-            >
-              Logout
-            </button>
-          </>
-        )}
       </div>
 
       {/* CARD */}
