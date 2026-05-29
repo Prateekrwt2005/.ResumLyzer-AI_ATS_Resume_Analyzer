@@ -50,6 +50,8 @@ const isProd = process.env.NODE_ENV === "production";
     stack: error.stack
   });
 }
+};
+
 // ---------------- LOGIN ----------------
 export const loginUser = async (req, res) => {
   try {
