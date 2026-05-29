@@ -43,9 +43,13 @@ const isProd = process.env.NODE_ENV === "production";
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Registration failed" });
-  }
-};
+  console.error("REGISTER ERROR:", error);
+
+  res.status(500).json({
+    message: error.message,
+    stack: error.stack
+  });
+}
 // ---------------- LOGIN ----------------
 export const loginUser = async (req, res) => {
   try {

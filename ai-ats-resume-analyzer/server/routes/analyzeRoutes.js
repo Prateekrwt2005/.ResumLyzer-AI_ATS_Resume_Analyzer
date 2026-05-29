@@ -6,9 +6,9 @@ import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// --------------------
+
 // MULTER CONFIG
-// --------------------
+
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
