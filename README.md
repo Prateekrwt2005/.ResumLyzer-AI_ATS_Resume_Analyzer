@@ -1,8 +1,20 @@
-# 🚀 .Resumlyzer – AI ATS Resume Analyzer
+# .Resumlyzer
 
-![Resumlyzer Banner](./5410980.png)
+---
 
-> **Resumlyzer** is a premium, full-stack AI-based Resume intelligence platform designed to evaluate candidate resumes against targeted job descriptions. It simulates corporate Applicant Tracking System (ATS) parsing engines to compute precision scoring, analyze skills matching, and provide deep, contextual feedback.
+<p align="center">
+  <img src="./5410980.png" alt="Resumlyzer Logo" width="180" />
+</p>
+
+<p align="center">
+  <b>Smart AI-powered resume intelligence platform that analyzes resumes against job descriptions, computes ATS scores, identifies skill gaps, and generates tailored improvement strategies.</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=blue" alt="Top Language" />
+  <img src="https://img.shields.io/github/repo-size/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=orange" alt="Repo Size" />
+  <img src="https://img.shields.io/github/license/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=green" alt="License" />
+</p>
 
 ---
 
