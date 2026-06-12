@@ -3,7 +3,12 @@ import Groq from "groq-sdk";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import ResumeAnalysis from "../models/ResumeAnalysis.js";
 
+
+
 export const analyzeResume = async (req, res) => {
+
+   console.log("REQ.FILE:", req.file);
+  console.log("REQ.BODY:", req.body);
   try {
     if (!process.env.GROQ_API_KEY) {
       throw new Error("GROQ_API_KEY not loaded");
