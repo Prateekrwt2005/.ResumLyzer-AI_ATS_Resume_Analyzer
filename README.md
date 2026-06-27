@@ -11,9 +11,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/languages/top/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=blue" alt="Top Language" />
-  <img src="https://img.shields.io/github/repo-size/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=orange" alt="Repo Size" />
-  <img src="https://img.shields.io/github/license/Prateekrwt2005/.ResumLyzer-AI_ATS_Resume_Analyzer?style=flat-square&color=green" alt="License" />
+  <img src="https://img.shields.io/badge/javascript-97.9%25-007acc?style=flat-square" alt="javascript" />
+  <img src="https://img.shields.io/badge/repo_size-28.4_MiB-fe7d37?style=flat-square" alt="repo size" />
+  <img src="https://img.shields.io/badge/license-not_specified-84b209?style=flat-square" alt="license" />
 </p>
 
 ---
